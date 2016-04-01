@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.Map;
 
 public class CurrencyCalc extends Application {
@@ -32,6 +33,7 @@ public class CurrencyCalc extends Application {
 
         border.setTop(getLogo());
 
+        // GET CURRENCY DATA
         CurrencyDataGetter currencyDataGetter = new CurrencyDataGetter();
         Map<String, BigDecimal> currencyRates = currencyDataGetter.getConversionRates();
 
@@ -61,8 +63,10 @@ public class CurrencyCalc extends Application {
         ObservableList<String> currencyOptions =
                 FXCollections.observableArrayList(currencyRates.keySet());
         ComboBox comboBox = new ComboBox(currencyOptions);
+        comboBox.getSelectionModel().select(0); // Set some currency initially
         grid.getChildren().add(comboBox);
         GridPane.setConstraints(comboBox, 0, 1 );
+
 
         // TEXTFIELD FOR OTHER CURRENCY
         TextField otherCurrencyTextField = new TextField("0");
@@ -98,13 +102,23 @@ public class CurrencyCalc extends Application {
 
         // EUR INPUT FIELD EVENT LISTENER
         eurTextField.setOnKeyReleased((event) -> {
-            if (NumberUtils.isParsable(eurTextField.getText()) &&
-                    comboBox.getSelectionModel().getSelectedItem().toString() != null) {
+            BigDecimal rate = currencyRates.get(comboBox.getSelectionModel().getSelectedItem().toString());
+            if (NumberUtils.isParsable(eurTextField.getText()) && rate != null) {
                 BigDecimal eurValue = new BigDecimal(eurTextField.getText());
-                BigDecimal rate = currencyRates.get(comboBox.getSelectionModel().getSelectedItem().toString());
                 otherCurrencyTextField.setText(String.valueOf(eurValue.multiply(rate)));
             } else {
                 otherCurrencyTextField.setText("Invalid input");
+            }
+        });
+
+        // OTHER CURRENCY TEXT FIELD LISTENER
+        otherCurrencyTextField.setOnKeyReleased((event) -> {
+            BigDecimal rate = currencyRates.get(comboBox.getSelectionModel().getSelectedItem().toString());
+            if (NumberUtils.isParsable(otherCurrencyTextField.getText()) && rate != null) {
+                BigDecimal otherCurrencyValue = new BigDecimal(otherCurrencyTextField.getText());
+                eurTextField.setText(String.valueOf(otherCurrencyValue.divide(rate, MathContext.DECIMAL32)));
+            } else {
+                eurTextField.setText("Invalid input");
             }
         });
 
@@ -124,6 +138,7 @@ public class CurrencyCalc extends Application {
         Canvas canvas = new Canvas(250,50);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
+        // BACKGROUND
         gc.setFill(Color.BLACK);
         gc.fillRect(0,0,250,50);
 
@@ -151,6 +166,14 @@ public class CurrencyCalc extends Application {
         gc.strokeArc(87,10,15,15,90,-180, ArcType.OPEN);
         gc.strokeLine(85,25,95,25);
         gc.strokeLine(85,33,95,33);
+
+        // CHINESE YUAN
+        gc.strokeLine(120,10,128,25);
+        gc.strokeLine(128,25,136,10);
+        gc.strokeLine(128,25,128,40);
+        gc.strokeLine(123,30,132,30);
+
+
         return canvas;
     }
 }

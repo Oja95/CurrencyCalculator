@@ -14,8 +14,16 @@ import java.util.Map;
 
 public class CurrencyDataGetter  {
 
+    /**
+     * Data structure that contains a currency and its corresponding rate to euro.
+     */
     private final Map<String, BigDecimal> conversionRates = new HashMap<String, BigDecimal>();
 
+    /**
+     * Gets the current currency rates for EU Central Bank site.
+     * Reads a document in XML file and then parses the necessary data into a map.
+     * @throws Exception if something unexpected happens. There are so many things that could blow up.
+     */
     private void fetchWebData() throws Exception {
         URL url = new URL("http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml");
         URLConnection con = url.openConnection();
@@ -37,6 +45,12 @@ public class CurrencyDataGetter  {
         }
     }
 
+    /**
+     * Gets conversion rates from a resource file (resources/currencyRates.txt).
+     * Store read data in map similar to {@link #fetchWebData()}.
+     * @return true if data reading was successful, false otherwise.
+     * @throws IOException
+     */
     private boolean fetchResourceData() throws IOException {
         File file = new File(getClass().getClassLoader().getResource("currencyRates.txt").getFile());
         if (!file.exists()) {
@@ -55,6 +69,10 @@ public class CurrencyDataGetter  {
         return true;
     }
 
+    /**
+     * At first tries to get data from EU Central Bank website. If fails, then it reads from a resource file.
+     * If that fails aswell, throw an exception.
+     */
     private void fetchData() {
         try {
             fetchWebData();
@@ -67,6 +85,10 @@ public class CurrencyDataGetter  {
         }
     }
 
+    /**
+     * A getter to get this object's Map
+     * @return conversionRates Map
+     */
     public Map<String, BigDecimal> getConversionRates() {
         fetchData();
         return conversionRates;

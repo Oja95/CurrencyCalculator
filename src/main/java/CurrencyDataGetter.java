@@ -12,7 +12,7 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CurrencyDataGetter  {
+public class CurrencyDataGetter {
 
     /**
      * Data structure that contains a currency and its corresponding rate to euro.
@@ -22,6 +22,7 @@ public class CurrencyDataGetter  {
     /**
      * Gets the current currency rates for EU Central Bank site.
      * Reads a document in XML file and then parses the necessary data into a map.
+     *
      * @throws Exception if something unexpected happens. There are so many things that could blow up.
      */
     private void fetchWebData() throws Exception {
@@ -40,7 +41,7 @@ public class CurrencyDataGetter  {
 
             if (rateNode != null && currencyNode != null) {
                 conversionRates.put(currencyNode.getTextContent(),
-                                    new BigDecimal(rateNode.getTextContent()));
+                        new BigDecimal(rateNode.getTextContent()));
             }
         }
     }
@@ -48,6 +49,7 @@ public class CurrencyDataGetter  {
     /**
      * Gets conversion rates from a resource file (resources/currencyRates.txt).
      * Store read data in map similar to {@link #fetchWebData()}.
+     *
      * @return true if data reading was successful, false otherwise.
      * @throws IOException
      */
@@ -69,7 +71,10 @@ public class CurrencyDataGetter  {
         return true;
     }
 
-
+    /**
+     *
+     * @return
+     */
     public Map<String, BigDecimal> getWebCurrencyData() {
         try {
             fetchWebData();
@@ -82,7 +87,7 @@ public class CurrencyDataGetter  {
     public Map<String, BigDecimal> getFileCurrencyData() {
         try {
             fetchResourceData();
-        } catch (Exception e ){
+        } catch (Exception e) {
             throw new RuntimeException("Something broke whilist reading data from resource file.");
         }
         return conversionRates;

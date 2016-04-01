@@ -75,6 +75,8 @@ public class CurrencyCalc extends Application {
             }
         });
 */
+        CurrencyDataGetter currencyDataGetter = new CurrencyDataGetter();
+
         Scene scene = new Scene(border, 250, 250);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);

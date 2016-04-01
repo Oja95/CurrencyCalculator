@@ -69,28 +69,23 @@ public class CurrencyDataGetter  {
         return true;
     }
 
-    /**
-     * At first tries to get data from EU Central Bank website. If fails, then it reads from a resource file.
-     * If that fails aswell, throw an exception.
-     */
-    private void fetchData() {
+
+    public Map<String, BigDecimal> getWebCurrencyData() {
         try {
             fetchWebData();
         } catch (Exception e) {
-            try {
-                fetchResourceData();
-            } catch (IOException e1) {
-                throw new RuntimeException("Could not read currency data!");
-            }
+            throw new RuntimeException("Something broke whilist reading data from web");
         }
-    }
-
-    /**
-     * A getter to get this object's Map
-     * @return conversionRates Map
-     */
-    public Map<String, BigDecimal> getConversionRates() {
-        fetchData();
         return conversionRates;
     }
+
+    public Map<String, BigDecimal> getFileCurrencyData() {
+        try {
+            fetchResourceData();
+        } catch (Exception e ){
+            throw new RuntimeException("Something broke whilist reading data from resource file.");
+        }
+        return conversionRates;
+    }
+
 }

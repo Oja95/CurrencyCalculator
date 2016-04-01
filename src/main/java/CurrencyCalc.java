@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -21,6 +22,8 @@ import java.util.Map;
 
 public class CurrencyCalc extends Application {
 
+    private Map<String, BigDecimal> currencyValues;
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -29,13 +32,15 @@ public class CurrencyCalc extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         primaryStage.setTitle("Currency Calculator");
+        primaryStage.setScene(optionsScene(primaryStage));
+        primaryStage.setResizable(false);
+        primaryStage.show();
+    }
+
+    private Scene currencyCalculatorScene(Map<String, BigDecimal> currencyRates) {
         BorderPane border = new BorderPane();
 
         border.setTop(getLogo());
-
-        // GET CURRENCY DATA
-        CurrencyDataGetter currencyDataGetter = new CurrencyDataGetter();
-        Map<String, BigDecimal> currencyRates = currencyDataGetter.getConversionRates();
 
         // INITIALIZE GRID
         GridPane grid = new GridPane();
@@ -122,10 +127,49 @@ public class CurrencyCalc extends Application {
             }
         });
 
-        Scene scene = new Scene(border, 250, 180);
+        return new Scene(border, 250, 180);
+    }
+
+    private void setScene(Scene scene, Stage primaryStage) {
         primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
-        primaryStage.show();
+    }
+
+    private Scene optionsScene(Stage primaryStage) {
+        BorderPane optionsBorderPane = new BorderPane();
+        optionsBorderPane.setTop(getLogo());
+
+        ColumnConstraints columnConstraints = new ColumnConstraints(250);
+        GridPane optionsGrid = new GridPane();
+
+        optionsGrid.getColumnConstraints().add(columnConstraints);
+
+        optionsGrid.setPadding(new Insets(10,10,10,10));
+        optionsGrid.setVgap(5);
+        optionsGrid.setHgap(5);
+
+        Button webDataButton = new Button("Get data from web");
+        optionsGrid.getChildren().add(webDataButton);
+        GridPane.setConstraints(webDataButton, 0, 0);
+
+        Button fileDataButton = new Button("Get data from file");
+        optionsGrid.getChildren().add(fileDataButton);
+        GridPane.setConstraints(fileDataButton, 0, 1);
+
+        optionsBorderPane.setCenter(optionsGrid);
+
+        CurrencyDataGetter currencyDataGetter = new CurrencyDataGetter();
+
+        webDataButton.setOnAction(event -> {
+            setCurrencyValues(currencyDataGetter.getWebCurrencyData());
+            setScene(currencyCalculatorScene(currencyValues), primaryStage);
+        });
+
+        fileDataButton.setOnAction(event -> {
+            setCurrencyValues(currencyDataGetter.getFileCurrencyData());
+            setScene(currencyCalculatorScene(currencyValues), primaryStage);
+        });
+
+        return new Scene(optionsBorderPane, 250, 180);
     }
 
 
@@ -175,5 +219,9 @@ public class CurrencyCalc extends Application {
 
 
         return canvas;
+    }
+
+    public void setCurrencyValues(Map<String, BigDecimal> currencyValues) {
+        this.currencyValues = currencyValues;
     }
 }

@@ -13,6 +13,7 @@ import javafx.scene.paint.*;
 import javafx.scene.shape.ArcType;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -34,6 +35,7 @@ public class CurrencyCalc extends Application {
         CurrencyDataGetter currencyDataGetter = new CurrencyDataGetter();
         Map<String, BigDecimal> currencyRates = currencyDataGetter.getConversionRates();
 
+        // INITIALIZE GRID
         GridPane grid = new GridPane();
 
         ColumnConstraints columnConstraints = new ColumnConstraints(80);
@@ -43,36 +45,72 @@ public class CurrencyCalc extends Application {
         grid.setVgap(5);
         grid.setHgap(5);
 
+        // LABEL FOR EUR
         Label eurLabel = new Label("EUR");
         eurLabel.setFont(new Font(20));
         GridPane.setConstraints(eurLabel, 0, 0);
         grid.getChildren().add(eurLabel);
 
+        // TEXTFIELD FOR EUR VALUE
         TextField eurTextField = new TextField("0");
         GridPane.setConstraints(eurTextField, 1, 0);
         grid.getChildren().add(eurTextField);
 
 
+        // COMBOBOX FOR OTHER CURRENCIES
         ObservableList<String> currencyOptions =
                 FXCollections.observableArrayList(currencyRates.keySet());
         ComboBox comboBox = new ComboBox(currencyOptions);
         grid.getChildren().add(comboBox);
         GridPane.setConstraints(comboBox, 0, 1 );
 
+        // TEXTFIELD FOR OTHER CURRENCY
         TextField otherCurrencyTextField = new TextField("0");
         GridPane.setConstraints(otherCurrencyTextField, 1, 1);
         grid.getChildren().add(otherCurrencyTextField);
 
-        // BUTTON
+        // BUTTON TO EMPTY FIELDS
         Button button = new Button("Empty");
         grid.getChildren().add(button);
         GridPane.setConstraints(button, 1, 2);
 
         border.setCenter(grid);
 
+        // EVENT LISTENERS
+        // HANDLE BUTTON EVENT
+        button.setOnAction((event) -> {
+            eurTextField.setText("0");
+            otherCurrencyTextField.setText("0");
+        });
+
+        // COMBO BOX EVENT
+        comboBox.setOnAction((event) -> {
+            String selectedItem = comboBox.getSelectionModel().getSelectedItem().toString();
+            String eurValue = eurTextField.getText();
+            if (NumberUtils.isParsable(eurValue)) {
+                BigDecimal rate = currencyRates.get(selectedItem);
+                BigDecimal oldValue = new BigDecimal(eurValue);
+                otherCurrencyTextField.setText(String.valueOf(oldValue.multiply(rate)));
+            } else {
+                otherCurrencyTextField.setText("Invalid input");
+            }
+        });
+
+        // EUR INPUT FIELD EVENT LISTENER
+        eurTextField.setOnKeyReleased((event) -> {
+            if (NumberUtils.isParsable(eurTextField.getText()) &&
+                    comboBox.getSelectionModel().getSelectedItem().toString() != null) {
+                BigDecimal eurValue = new BigDecimal(eurTextField.getText());
+                BigDecimal rate = currencyRates.get(comboBox.getSelectionModel().getSelectedItem().toString());
+                otherCurrencyTextField.setText(String.valueOf(eurValue.multiply(rate)));
+            } else {
+                otherCurrencyTextField.setText("Invalid input");
+            }
+        });
+
         Scene scene = new Scene(border, 250, 180);
         primaryStage.setScene(scene);
-//        primaryStage.setResizable(false);
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 

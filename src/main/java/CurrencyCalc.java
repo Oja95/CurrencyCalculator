@@ -25,6 +25,7 @@ public class CurrencyCalc extends Application {
      * Data structure that cointains currency and its corresponding rate.
      */
     private Map<String, BigDecimal> currencyValues;
+    private Stage primaryStage;
 
     public static void main(String[] args) {
         launch(args);
@@ -34,7 +35,8 @@ public class CurrencyCalc extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         primaryStage.setTitle("Currency Calculator");
-        primaryStage.setScene(optionsScene(primaryStage));
+        this.primaryStage = primaryStage;
+        primaryStage.setScene(optionsScene());
         primaryStage.setResizable(false);
         primaryStage.show();
     }
@@ -45,7 +47,7 @@ public class CurrencyCalc extends Application {
      * @param currencyRates currency rates
      * @return currency calculator Scene object
      */
-    private Scene currencyCalculatorScene(Map<String, BigDecimal> currencyRates, Stage primaryStage) {
+    private Scene currencyCalculatorScene(Map<String, BigDecimal> currencyRates) {
         BorderPane border = new BorderPane();
 
         border.setTop(getLogo());
@@ -107,7 +109,7 @@ public class CurrencyCalc extends Application {
 
         // HANDLE "BACK" BUTTON EVENT
         button2.setOnAction(event1 -> {
-            setScene(optionsScene(primaryStage), primaryStage);
+            setScene(optionsScene());
         });
 
         // COMBO BOX EVENT
@@ -151,10 +153,9 @@ public class CurrencyCalc extends Application {
     /**
      * Method that creates necessary elemets for the options scene.
      * User will be prompted where to read the currency data from.
-     * @param primaryStage This Stage might want to change primaryStage's scene.
      * @return options Scene object.
      */
-    private Scene optionsScene(Stage primaryStage) {
+    private Scene optionsScene() {
         BorderPane optionsBorderPane = new BorderPane();
         optionsBorderPane.setTop(getLogo());
 
@@ -181,12 +182,12 @@ public class CurrencyCalc extends Application {
 
         webDataButton.setOnAction(event -> {
             setCurrencyValues(currencyDataGetter.getWebCurrencyData());
-            setScene(currencyCalculatorScene(currencyValues, primaryStage), primaryStage);
+            setScene(currencyCalculatorScene(currencyValues));
         });
 
         fileDataButton.setOnAction(event -> {
             setCurrencyValues(currencyDataGetter.getFileCurrencyData());
-            setScene(currencyCalculatorScene(currencyValues, primaryStage), primaryStage);
+            setScene(currencyCalculatorScene(currencyValues));
         });
 
         return new Scene(optionsBorderPane, 250, 200);
@@ -244,9 +245,8 @@ public class CurrencyCalc extends Application {
      * Method to switch scenes.
      * Made this method so scenes can be switched outside the main method
      * @param scene Scene to switch to
-     * @param primaryStage Stage on which the scene is switched
      */
-    private void setScene(Scene scene, Stage primaryStage) {
+    private void setScene(Scene scene) {
         primaryStage.setScene(scene);
     }
 

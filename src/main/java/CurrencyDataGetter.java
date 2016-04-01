@@ -71,10 +71,6 @@ public class CurrencyDataGetter {
         return true;
     }
 
-    /**
-     *
-     * @return
-     */
     public Map<String, BigDecimal> getWebCurrencyData() {
         try {
             fetchWebData();

@@ -1,12 +1,21 @@
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.*;
 import javafx.scene.shape.ArcType;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
+
+import java.math.BigDecimal;
+import java.util.Map;
 
 public class CurrencyCalc extends Application {
 
@@ -20,67 +29,50 @@ public class CurrencyCalc extends Application {
         primaryStage.setTitle("Currency Calculator");
         BorderPane border = new BorderPane();
 
+        border.setTop(getLogo());
 
-        border.setCenter(getLogo());
-        border.setBottom(new Button("asd"));
-
-/*
-        FlowPane flow = new FlowPane();
-
-        Label eurText = new Label("EUR ");
-        TextField inputText = new TextField("0");
-        flow.getChildren().add(eurText);
-        flow.getChildren().add(inputText);
-
-
-
-        flow.getChildren().add(canvas);
-
-        ObservableList<String> items = FXCollections.observableArrayList (
-                "USD", "bongs", "Doubloons");
-        ComboBox<String> comboBox = new ComboBox<String>(items);
-        comboBox.setMaxHeight(100);
-
-        flow.getChildren().add(comboBox);
-
-        TextField currency = new TextField("0");
-        flow.getChildren().add(currency);
-
-        comboBox.valueProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                // change coenficent
-            }
-        });
-
-        inputText.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-
-                float eurs = Float.parseFloat(inputText.getCharacters().toString());
-                switch (comboBox.getValue()){
-                    case "USD":
-                        float usd = eurs * 1.13f;
-                        currency.setText(String.valueOf(usd));
-                        break;
-                    case "Doubloons":
-                        float doubloons = 20 * eurs;
-                        currency.setText(String.valueOf(doubloons));
-                        break;
-                    case "bongs":
-                        float bongs = 420 * eurs;
-                        currency.setText(String .valueOf(bongs));
-                        break;
-                }
-            }
-        });
-*/
         CurrencyDataGetter currencyDataGetter = new CurrencyDataGetter();
-        System.out.println(currencyDataGetter.getConversionRates());
+        Map<String, BigDecimal> currencyRates = currencyDataGetter.getConversionRates();
 
-        Scene scene = new Scene(border, 250, 250);
+        GridPane grid = new GridPane();
+
+        ColumnConstraints columnConstraints = new ColumnConstraints(80);
+        grid.getColumnConstraints().add(columnConstraints);
+
+        grid.setPadding(new Insets(10,10,10,10));
+        grid.setVgap(5);
+        grid.setHgap(5);
+
+        Label eurLabel = new Label("EUR");
+        eurLabel.setFont(new Font(20));
+        GridPane.setConstraints(eurLabel, 0, 0);
+        grid.getChildren().add(eurLabel);
+
+        TextField eurTextField = new TextField("0");
+        GridPane.setConstraints(eurTextField, 1, 0);
+        grid.getChildren().add(eurTextField);
+
+
+        ObservableList<String> currencyOptions =
+                FXCollections.observableArrayList(currencyRates.keySet());
+        ComboBox comboBox = new ComboBox(currencyOptions);
+        grid.getChildren().add(comboBox);
+        GridPane.setConstraints(comboBox, 0, 1 );
+
+        TextField otherCurrencyTextField = new TextField("0");
+        GridPane.setConstraints(otherCurrencyTextField, 1, 1);
+        grid.getChildren().add(otherCurrencyTextField);
+
+        // BUTTON
+        Button button = new Button("Empty");
+        grid.getChildren().add(button);
+        GridPane.setConstraints(button, 1, 2);
+
+        border.setCenter(grid);
+
+        Scene scene = new Scene(border, 250, 180);
         primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
+//        primaryStage.setResizable(false);
         primaryStage.show();
     }
 
@@ -91,7 +83,7 @@ public class CurrencyCalc extends Application {
      * @return Canvas object with drawn logo
      */
     private Canvas getLogo() {
-        Canvas canvas = new Canvas(250,250);
+        Canvas canvas = new Canvas(250,50);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         gc.setFill(Color.BLACK);

@@ -76,6 +76,7 @@ public class CurrencyCalc extends Application {
         });
 */
         CurrencyDataGetter currencyDataGetter = new CurrencyDataGetter();
+        System.out.println(currencyDataGetter.getConversionRates());
 
         Scene scene = new Scene(border, 250, 250);
         primaryStage.setScene(scene);

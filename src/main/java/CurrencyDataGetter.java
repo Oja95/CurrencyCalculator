@@ -15,13 +15,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.Map;
 
 public class CurrencyDataGetter  {
 
     private final Map<String, BigDecimal> conversionRates = new HashMap<String, BigDecimal>();
 
-    private void fetchWebData() throws IOException, ParserConfigurationException, SAXException {
+    private void fetchWebData() throws Exception {
         URL url = new URL("http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml");
         URLConnection con = url.openConnection();
         InputStream is = con.getInputStream();
@@ -42,12 +43,36 @@ public class CurrencyDataGetter  {
         }
     }
 
-    private void fetchResourceData() {
+    private boolean fetchResourceData() throws IOException {
+        File file = new File(getClass().getClassLoader().getResource("currencyRates.txt").getFile());
+        if (!file.exists()) {
+            return false;
+        }
 
+        FileInputStream is = new FileInputStream(file);
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        String line;
+        while ((line = br.readLine()) != null) {
+            String[] parts = line.split(" ");
+            conversionRates.put(parts[0], new BigDecimal(parts[1]));
+        }
+        return true;
     }
 
-    public Map<String, BigDecimal> getConversionRates () {
-
+    private void fetchData() {
+        try {
+            fetchWebData();
+        } catch (Exception e) {
+            try {
+                fetchResourceData();
+            } catch (IOException e1) {
+                throw new RuntimeException("Could not read currency data!");
+            }
+        }
     }
 
+    public Map<String, BigDecimal> getConversionRates() {
+        fetchData();
+        return conversionRates;
+    }
 }

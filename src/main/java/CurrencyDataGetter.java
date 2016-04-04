@@ -54,6 +54,7 @@ public class CurrencyDataGetter {
      * @throws IOException
      */
     private boolean fetchResourceData() throws IOException {
+        // FIXME: 2.04.16 Handle cases where file not found, throw proper exceptions 
         File file = new File(getClass().getClassLoader().getResource("currencyRates.txt").getFile());
         if (!file.exists()) {
             return false;

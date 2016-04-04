@@ -77,6 +77,7 @@ public class CurrencyCalc extends Application {
         // COMBOBOX FOR OTHER CURRENCIES
         ObservableList<String> currencyOptions =
                 FXCollections.observableArrayList(currencyRates.keySet());
+        FXCollections.sort(currencyOptions);
         ComboBox comboBox = new ComboBox(currencyOptions);
         comboBox.getSelectionModel().select(0); // Set some currency initially
         grid.getChildren().add(comboBox);

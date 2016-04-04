@@ -53,14 +53,10 @@ public class CurrencyDataGetter {
      * @return true if data reading was successful, false otherwise.
      * @throws IOException
      */
-    private boolean fetchResourceData() throws IOException {
+    private void fetchResourceData() throws IOException {
         // FIXME: 2.04.16 Handle cases where file not found, throw proper exceptions 
-        File file = new File(getClass().getClassLoader().getResource("currencyRates.txt").getFile());
-        if (!file.exists()) {
-            return false;
-        }
+        InputStream is = getClass().getClassLoader().getResourceAsStream("currencyRates.txt");
 
-        FileInputStream is = new FileInputStream(file);
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         String line;
         while ((line = br.readLine()) != null) {
@@ -69,7 +65,6 @@ public class CurrencyDataGetter {
         }
         is.close();
         br.close();
-        return true;
     }
 
     public Map<String, BigDecimal> getWebCurrencyData() {
